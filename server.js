@@ -14,7 +14,6 @@ app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist/j
 app.use('/js', express.static(__dirname + '/assets/js'))
 
 app.get('/', (req, res) => {
-    const ruta = path.join(__dirname, 'index.html')
     res.render('index', {
         layout: 'index'
     })
