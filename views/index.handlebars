@@ -13,10 +13,16 @@
 
     {{> Navbar}}
 
-    <div class="container-fluid">
+    <div class="container-fluid min-vh-100">
         <div class="row">
-            <div class="col-md-4">.col-md-4</div>
-            <div class="col-md-8">
+            <div class="col-md-2 bg-secondary text-light min-vh-100">
+                {{#each categorias}}
+                {{>CategoryButton
+                data = this
+                }}
+                {{/each}}
+            </div>
+            <div class="col-md-10">
                 <div class="row">
                     {{#each product}}
                     {{> ProductCards
@@ -28,8 +34,26 @@
         </div>
     </div>
 
+
+
     <script src="/bootstrap/bootstrap.js"></script>
     <script src="/js/frontmain.js"></script>
+    <script>
+        const lateralButtons = document.querySelectorAll('.redirect-search-number')
+
+        lateralButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const category = event.target.dataset.category
+                window.location.replace(`/${category}`)
+            })
+        })
+
+        const searchBar = document.querySelector('#typeSearch')
+        searchBar.addEventListener(event => {
+            const {text} = req.body
+            console.log(text)
+        })
+    </script>
 </body>
 
 </html>

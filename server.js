@@ -16,10 +16,50 @@ app.use('/js', express.static(__dirname + '/assets/js'))
 
 app.get('/', async (req, res) => {
     const data = await pool.query('SELECT * FROM product')
-    console.log(data)
+    const categoryList = await pool.query('SELECT * FROM category')
+
+
+    const dataDescuento = data.map((item) => {
+        let newPrice = item.price
+        let newUrl = item.url_image
+        if (item.discount > 0) {
+            newPrice = item.price - ((item.discount * item.price) / 100)
+        }
+        if (item.url_image === '' || !item.url_image) {
+            newUrl = 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
+        }
+        return { name: item.name, url_image: newUrl, price: newPrice, category: item.category }
+    })
+
     res.render('index', {
         layout: 'index',
-        product: data
+        product: dataDescuento,
+        categorias: categoryList
+    })
+})
+
+app.get('/:category', async (req, res) => {
+    const categoryList = await pool.query('SELECT * FROM category')
+
+    const {category} = req.params
+    const data = await pool.query(`SELECT * FROM product WHERE category = ${category}`)
+
+    const dataDescuento = data.map((item) => {
+        let newPrice = item.price
+        let newUrl = item.url_image
+        if (item.discount > 0) {
+            newPrice = item.price - ((item.discount * item.price) / 100)
+        }
+        if (item.url_image === '' || !item.url_image) {
+            newUrl = 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
+        }
+        return { name: item.name, url_image: newUrl, price: newPrice, category: item.category }
+    })
+
+    res.render('index', {
+        layout: 'index',
+        product: dataDescuento,
+        categorias: categoryList
     })
 })
 
