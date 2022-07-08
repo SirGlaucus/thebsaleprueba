@@ -3,8 +3,13 @@ const express = require('express')
 const path = require('path')
 const exphbs = require('express-handlebars')
 const pool = require('./src/database')
+const bodyparser = require('body-parser')
 
 const app = express()
+
+// Para poder utilizar el body
+app.use(bodyparser.json())
+app.use(bodyparser.urlencoded({ extended: false }))
 
 // Configuracion del handlebars 
 app.set('view engine', 'handlebars')
@@ -19,7 +24,7 @@ app.get('/', async (req, res) => {
     const categoryList = await pool.query('SELECT * FROM category')
 
 
-    const dataDescuento = data.map((item) => {
+    const dataDiscounted = data.map((item) => {
         let newPrice = item.price
         let newUrl = item.url_image
         if (item.discount > 0) {
@@ -33,7 +38,7 @@ app.get('/', async (req, res) => {
 
     res.render('index', {
         layout: 'index',
-        product: dataDescuento,
+        product: dataDiscounted,
         categorias: categoryList
     })
 })
@@ -41,10 +46,10 @@ app.get('/', async (req, res) => {
 app.get('/:category', async (req, res) => {
     const categoryList = await pool.query('SELECT * FROM category')
 
-    const {category} = req.params
+    const { category } = req.params
     const data = await pool.query(`SELECT * FROM product WHERE category = ${category}`)
 
-    const dataDescuento = data.map((item) => {
+    const dataDiscounted = data.map((item) => {
         let newPrice = item.price
         let newUrl = item.url_image
         if (item.discount > 0) {
@@ -58,7 +63,39 @@ app.get('/:category', async (req, res) => {
 
     res.render('index', {
         layout: 'index',
-        product: dataDescuento,
+        product: dataDiscounted,
+        categorias: categoryList
+    })
+})
+
+app.post('/', async (req, res) => {
+    const categoryList = await pool.query('SELECT * FROM category')
+
+    const { text } = req.body
+    const data = await pool.query(`SELECT * FROM product `)
+    console.log(data)
+    const filteredData = data.filter((product) => {
+        const nameLower = product.name.toLowerCase()
+        const textLower = text.toLowerCase()
+        return nameLower.includes(textLower)
+    })
+
+
+    const dataDiscounted = filteredData.map((item) => {
+        let newPrice = item.price
+        let newUrl = item.url_image
+        if (item.discount > 0) {
+            newPrice = item.price - ((item.discount * item.price) / 100)
+        }
+        if (item.url_image === '' || !item.url_image) {
+            newUrl = 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
+        }
+        return { name: item.name, url_image: newUrl, price: newPrice, category: item.category }
+    })
+
+    res.render('index', {
+        layout: 'index',
+        product: dataDiscounted,
         categorias: categoryList
     })
 })

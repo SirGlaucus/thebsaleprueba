@@ -12,7 +12,6 @@
 <body>
 
     {{> Navbar}}
-
     <div class="container-fluid min-vh-100">
         <div class="row">
             <div class="col-md-2 bg-secondary text-light min-vh-100">
@@ -23,6 +22,9 @@
                 {{/each}}
             </div>
             <div class="col-md-10">
+                <div class="row">
+                    {{> DropDownSort}}
+                </div>
                 <div class="row">
                     {{#each product}}
                     {{> ProductCards
@@ -36,8 +38,8 @@
 
 
 
-    <script src="/bootstrap/bootstrap.js"></script>
-    <script src="/js/frontmain.js"></script>
+    <script src="/bootstrap/bootstrap.bundle.min.js"></script>
+    
     <script>
         const lateralButtons = document.querySelectorAll('.redirect-search-number')
 
@@ -46,12 +48,6 @@
                 const category = event.target.dataset.category
                 window.location.replace(`/${category}`)
             })
-        })
-
-        const searchBar = document.querySelector('#typeSearch')
-        searchBar.addEventListener(event => {
-            const {text} = req.body
-            console.log(text)
         })
     </script>
 </body>
